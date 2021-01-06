@@ -1,5 +1,5 @@
 --[[
-Simple PrefsRows API for 3.95/OpenITG, version 1.2
+Simple PrefsRows API for 3.95/OpenITG, version 1.3
 Licensed under Creative Commons Attribution-Share Alike 3.0 Unported
 (http://creativecommons.org/licenses/by-sa/3.0/)
 
@@ -136,7 +136,7 @@ function CreatePrefsRowEnum( Params, Names, prefname )
 	local amt = table.getn(Names)
 	local val = PREFSMAN:GetPreference(prefname)
 
-	return CreateOptionRowRange( Params, Names, prefname, 0, 1 )
+	return CreatePrefsRowRange( Params, Names, prefname, 0, 1 )
 end 
 
 -- creates a boolean toggle for a preference

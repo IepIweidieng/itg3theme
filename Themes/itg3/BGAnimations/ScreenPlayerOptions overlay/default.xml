@@ -1,7 +1,7 @@
 <ActorFrame> <children>
 
 <!--We lose just under 3 seconds on SSM when transitioning to SPO, so this gives it back to Players with some buffer on top of it. Do not add that time if switching back and forth from More Options-->
-<ActorFrame Command="%function(self) if ModsScreen ~= 'SongOptions' then ScreenSelectMusicTimer = (ScreenSelectMusicTimer + 10) end ModsScreen = 'PlayerOptions' end"/>
+<ActorFrame Command="%function(self) if ModsScreen ~= 'SongOptions' then ScreenSelectMusicTimer = (ScreenSelectMusicTimer or 0 + 10) end ModsScreen = 'PlayerOptions' end"/>
 
 <!--SPO Time Tracker-->
 <Layer Type="Quad"
@@ -99,6 +99,9 @@ OffCommand="diffusealpha,1;accelerate,0.3;diffusealpha,0"
 	/>
 
 <!-- system layer add -->
+<Layer
+File="ScreenPlayerOptions overlay.xml"
+/>
 <Layer
 File="..\_coins"
 />

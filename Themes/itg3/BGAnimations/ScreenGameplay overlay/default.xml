@@ -197,8 +197,10 @@ File="..\_gameplaycoins"
 <Layer
 Condition="not GAMESTATE:IsDemonstration()
 and GAMESTATE:IsPlayerEnabled(PLAYER_1)
+and GAMESTATE:GetCurrentSteps(PLAYER_1)
 and GAMESTATE:IsPlayerEnabled(PLAYER_2)
-and GAMESTATE:GetCurrentSong():GetDisplayArtist() == 'Dragonforce'
+and GAMESTATE:GetCurrentSteps(PLAYER_2)
+and GetSongArtist() == 'Dragonforce'
 and GAMESTATE:GetCurrentSteps(PLAYER_1):GetDifficulty() == GAMESTATE:GetCurrentSteps(PLAYER_2):GetDifficulty()"
 File="_battlemeter"
 />

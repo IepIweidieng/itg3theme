@@ -1,7 +1,7 @@
 <ActorFrame> <children>
 
 <!--We lose a few seconds when players have to scroll down to the Back Button, so this gives it back to Players after they have entered SPO once.-->
-<ActorFrame Command="%function(self) if ScreenPlayerOptionsTimer ~= GetOptionsSelectTime() then ScreenPlayerOptionsTimer = ScreenPlayerOptionsTimer + 6.0 end end"/>
+<ActorFrame Command="%function(self) if ScreenPlayerOptionsTimer ~= GetOptionsSelectTime() then ScreenPlayerOptionsTimer = ScreenPlayerOptionsTimer or 0 + 6.0 end end"/>
 
 
 <!--SSM Time Tracker-->

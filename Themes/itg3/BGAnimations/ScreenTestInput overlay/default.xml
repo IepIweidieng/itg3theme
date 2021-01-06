@@ -327,19 +327,19 @@ RightP2LeftOffMessageCommand="diffusecolor,0,0,0,1"
 <ActorFrame OnCommand="x,SCREEN_CENTER_X-SCREEN_WIDTH/3;y,SCREEN_CENTER_Y" ><children>
 <ActorFrame OnCommand="addy,-SCREEN_HEIGHT/5;zoom,.7"><children>
 <Layer
-File="start"
+File="start.png"
 InitCommand="y,-30"
 />
 <Layer
-File="select"
+File="select.png"
 InitCommand="y,30"
 />
 <Layer
-File="right"
+File="right.png"
 InitCommand="x,70"
 />
 <Layer
-File="right"
+File="right.png"
 InitCommand="x,-71;zoomx,-1"
 />
 
@@ -372,19 +372,19 @@ ResetButtonsMessageCommand="diffusealpha,0"
 
 <ActorFrame OnCommand="addy,SCREEN_HEIGHT/5;zoom,.7"><children>
 <Layer
-File="start"
+File="start.png"
 InitCommand="y,-30"
 />
 <Layer
-File="select"
+File="select.png"
 InitCommand="y,30"
 />
 <Layer
-File="right"
+File="right.png"
 InitCommand="x,70"
 />
 <Layer
-File="right"
+File="right.png"
 InitCommand="x,-71;zoomx,-1"
 />
 <Layer

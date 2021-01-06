@@ -43,7 +43,7 @@
 
 				end"> <children>
 		<AutoActor
-			File="FilterBG"
+			File="FilterBG.png"
 			OnCommand="%function(self)
 				self:diffusealpha(0)
 				if CustomMods[PLAYER_1].spin or CustomMods[PLAYER_1].spinreverse then 
@@ -105,7 +105,7 @@
 
 				end"> <children>
 		<AutoActor
-			File="FilterBG"
+			File="FilterBG.png"
 			OnCommand="%function(self)
 				self:diffusealpha(0)
 				if CustomMods[PLAYER_2].spin or CustomMods[PLAYER_2].spinreverse then 

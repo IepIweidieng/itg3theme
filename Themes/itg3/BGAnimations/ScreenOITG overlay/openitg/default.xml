@@ -21,7 +21,7 @@
 	<!-- XXX: without "draworder,1", this renders under _otherred. -->
 	<ActorFrame InitCommand="zoom,.8;X,SCREEN_CENTER_X+90;y,SCREEN_CENTER_Y+30;draworder,1"><children>
 		<Layer
-			File="_openitg"
+			File="_openitg.png"
 			OnCommand="cropright,1;faderight,1;sleep,.7;linear,.3;cropright,0;faderight,.1;linear,.03;faderight,0"
 		/>
 		<Layer

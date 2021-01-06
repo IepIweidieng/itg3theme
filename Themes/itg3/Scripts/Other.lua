@@ -51,7 +51,7 @@ end
 
 function Platform() return "arcade" end
 
-function IsPIUIO() return GetInputType() == "PIUIO`" end
+function IsPIUIO() return GetInputType() == "PIUIO" end
 function IsITGIO() return GetInputType() == "ITGIO" end
 
 function IsArcadeIO() return IsPIUIO() or IsITGIO() end

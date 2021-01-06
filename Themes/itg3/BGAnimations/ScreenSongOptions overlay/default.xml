@@ -1,6 +1,6 @@
 <ActorFrame> <children>
 
-<ActorFrame Command="%function(self) ModsScreen = 'SongOptions' end"/>
+<ActorFrame Command="%function(self) ModsScreen = 'SongOptions'; ScreenPlayerOptionsTimer = ScreenPlayerOptionsTimer or 0 end"/>
 
 <!--SPO Time Tracker-->
 <Layer Type="Quad"

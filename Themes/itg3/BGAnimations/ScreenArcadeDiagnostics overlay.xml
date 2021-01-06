@@ -1,3 +1,4 @@
+<ActorFrame> <children>
 <ActorFrame OnCommand="x,SCREEN_LEFT+160;y,SCREEN_TOP+80"> <children>
 	<Layer
 		Type="BitmapText"
@@ -107,4 +108,5 @@
 		OnCommand="x,10;y,30*7;horizalign,left;zoom,0.75;diffusealpha,0;linear,0.3;diffusealpha,1"
 		OffCommand="linear,0.3;diffusealpha,0"
 	/>																								   
+</children> </ActorFrame>
 </children> </ActorFrame>

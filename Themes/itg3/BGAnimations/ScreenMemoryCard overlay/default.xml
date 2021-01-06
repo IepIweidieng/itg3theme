@@ -1,3 +1,5 @@
+<ActorFrame>
+<children>
 <ActorFrame OnCommand="fov,52.4;">
 <children>
 <ActorFrame OnCommand="x,SCREEN_CENTER_X+10;y,SCREEN_CENTER_Y+130;spin;EffectMagnitude,60,0,0;">
@@ -238,5 +240,7 @@ UpdateCommand="%function(self,parent) self:setstate(15) self:zoom(.55) self:slee
 		/> 
 		
 		
+</children>
+</ActorFrame>
 </children>
 </ActorFrame>
