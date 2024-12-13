@@ -12,8 +12,8 @@ end
 function ScreenTitleBranch()
 	ScreenSelectMusicTimer = GetMusicSelectTime();
 	ScreenPlayerOptionsTimer = GetOptionsSelectTime();
-	if GAMESTATE:GetCoinMode() == COIN_MODE_HOME then return "ScreenTitleMenu" end
-	if GAMESTATE:IsEventMode() then return "ScreenEventMenu" end
+	if GAMESTATE:GetCoinMode() == COIN_MODE_HOME then return TitleScreenMenu() end
+	if GAMESTATE:IsEventMode() then return TitleScreenEvent() end
 	return TitleScreen();
 end
 
@@ -133,8 +133,22 @@ function ScreenSelectMusicPrevScreen()
 	return ScreenTitleBranch()
 end
 
+function GetForceAltTitleMenu()
+	return ForceAltTitleMenu
+end
+
+function TitleScreenMenu()
+	if GetForceAltTitleMenu() or (DayOfMonth() == 1 and MonthOfYear() == 4) then return "ScreenTitleMenuAlt" end
+return "ScreenTitleMenu"
+end
+
+function TitleScreenEvent()
+	if GetForceAltTitleMenu() or (DayOfMonth() == 1 and MonthOfYear() == 4) then return "ScreenEventMenuAlt" end
+return "ScreenEventMenu"
+end
+
 function TitleScreen()
-	if DayOfMonth() == 1 and MonthOfYear() == 4 then return "ScreenTitleAlt" end
+	if GetForceAltTitleMenu() or (DayOfMonth() == 1 and MonthOfYear() == 4) then return "ScreenTitleAlt" end
 return "ScreenTitleJoin"
 end
 

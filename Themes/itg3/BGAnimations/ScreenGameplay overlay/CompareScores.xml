@@ -1,0 +1,40 @@
+<ActorFrame><children>
+<ActorFrame
+	InitCommand="%function(self)
+		ScoreAheadP1 = false;
+		ScoreAheadP2 = false;
+
+		local function GetScore(pn)
+			if GAMESTATE:GetEditSourceSteps() ~= nil then return 0; end
+			
+			local res = 0;
+			local obj = SCREENMAN:GetTopScreen():GetChild('PercentP' .. pn);
+			if obj then
+				res = obj:GetChild('PercentP' .. pn):GetText();
+			end
+			obj = SCREENMAN:GetTopScreen():GetChild('ScoreP' .. pn);
+			if obj then
+				res = obj:GetChild('ScoreDisplayPercentage Percent'):GetChild('PercentP' .. pn):GetText();
+			end
+
+			res = string.gsub(res, '%%', '');
+			return tonumber(res) or 0;
+		end
+
+		self:SetUpdateFunction(
+			function(self)
+				for pn = 1, 2 do
+					local target = _G['ScreenGameplay_ScoreP' .. pn];
+					_G['ScoreLastAheadP' .. pn] = _G['ScoreAheadP' .. pn];
+					_G['ScoreAheadP' .. pn] = GetScore(pn) >= GetScore(3-pn);
+					if _G['ScoreAheadP' .. pn] ~= _G['ScoreLastAheadP' .. pn] then
+						if _G['ScoreAheadP' .. pn] then target:playcommand('Ahead');
+						else target:playcommand('Behind');
+						end
+					end
+				end
+			end
+		);
+	end"
+/>
+</children></ActorFrame>

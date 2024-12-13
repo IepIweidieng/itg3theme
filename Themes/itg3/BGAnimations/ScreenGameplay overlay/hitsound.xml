@@ -1,0 +1,188 @@
+<ActorFrame><children>
+	<Layer
+		Type="Quad"
+		InitCommand="%function(self)
+			self:hidden(1);
+
+			local cos = math.cos;
+			local sin = math.sin;
+			local pi = math.pi;
+			local degToRad = pi/180;
+			local atan = math.atan;
+			function getPan(pn, column)
+				local obj = _G['pl'..pn+1];
+
+			-- (x, y, z) -> rotationz -> rotationy -> rotationx -> (xt, yt, zt)
+					if obj then
+					local nf = obj:GetChild('NoteField');
+					local x = ((2*(column-2)+1)*64/2 + GAMESTATE:GetX(pn, column, 0));
+					local y = (GAMESTATE:GetY(pn, column, 0));
+					local z = (GAMESTATE:GetZ(pn, column, 0));
+					local rotx, roty, rotz = nf:getrotation();
+					local rotxt, rotyt, rotzt = obj:getrotation();
+					rotx = degToRad*rotx;
+					roty = degToRad*roty;
+					rotz = degToRad*rotz;
+					rotxt = degToRad*rotxt;
+					rotyt = degToRad*rotyt;
+					rotzt = degToRad*rotzt;
+					local cosx = cos(rotx);
+					local cosy = cos(roty);
+					local cosz = cos(rotz);
+					local sinx = sin(rotx);
+					local siny = sin(roty);
+					local sinz = sin(rotz);
+					local xt = (x*cosy*cosz-y*cosy*sinz+z*siny) * obj:GetZoomX()*obj:GetBaseZoomX();
+					local yt = (x*(sinx*siny*cosz+cosx*sinz)+y*(-sinx*siny*sinz+cosx*cosz)-z*sinx*cosy) * obj:GetZoomY();
+					local zt = (x*(-cosx*siny*cosz+sinx*sinz)+y*(cosx*siny*sinz+sinx*cosz)+z*cosx*cosy) * obj:GetZoomZ();
+
+					local cosyt = cos(rotyt);
+					local coszt = cos(rotzt);
+					local sinyt = sin(rotyt);
+					local sinzt = sin(rotzt);
+
+					return 2*atan((2*((nf:GetX() + xt*cosyt*coszt-yt*cosyt*sinzt+zt*sinyt) * nf:GetZoomX()*nf:GetBaseZoomX())-SCREEN_CENTER_X)/SCREEN_WIDTH)/pi;
+				else
+					return 0;
+				end
+			end
+		end"
+	/>
+
+
+	<ActorFrame
+		Condition="GetOptionHitSounds(0) ~= 0.0"
+		OnCommand="%function(self)
+			local P1CB = 0;
+			local P1C0RS = P1C0RS;
+			local P1C1RS = P1C1RS;
+			local P1C2RS = P1C2RS;
+			local P1C3RS = P1C3RS;
+			local P1CBRS = P1CBRS;
+			local stageStatsP1 = STATSMAN:GetCurStageStats():GetPlayerStageStats(0);
+			local showComboAt = tonumber(THEME:GetMetric('Combo', 'ShowComboAt'));
+			local getCombo = stageStatsP1.GetCurrentCombo;
+			local pan = P1C0RS.pan;
+			local getPan = getPan;
+				P1C0RS:volume(GetOptionHitSounds(0));
+				P1C1RS:volume(GetOptionHitSounds(0));
+				P1C2RS:volume(GetOptionHitSounds(0));
+				P1C3RS:volume(GetOptionHitSounds(0));
+				P1CBRS:volume(GetOptionHitSounds(0));
+				P1CBRS:pan(-0.64);
+			self:SetUpdateFunction(function(self)
+				P1C0RS:pan(getPan(0, 0));
+				P1C1RS:pan(getPan(0, 1));
+				P1C2RS:pan(getPan(0, 2));
+				P1C3RS:pan(getPan(0, 3));
+				if getCombo(stageStatsP1) < P1CB and P1CB >= showComboAt then
+					P1CBRS:Play();
+				end
+				P1CB = getCombo(stageStatsP1);
+			end)
+		end"
+		StepP1LeftPressMessageCommand="%function(self) P1C0RS:Play(); end"
+		StepP1RightPressMessageCommand="%function(self) P1C1RS:Play(); end"
+		StepP1DownPressMessageCommand="%function(self) P1C2RS:Play(); end"
+		StepP1UpPressMessageCommand="%function(self) P1C3RS:Play(); end"
+	><children>
+		<Layer
+			Type="ActorSound"
+			File="@THEME:GetPath(EC_SOUNDS, '', 'normal-hitnormal')"
+			InitCommand="%function(self) P1C0RS = self:get(); end"
+		/>
+
+		<Layer
+			Type="ActorSound"
+			File="@THEME:GetPath(EC_SOUNDS, '', 'normal-hitnormal')"
+			InitCommand="%function(self) P1C1RS = self:get(); end"
+		/>
+
+		<Layer
+			Type="ActorSound"
+			File="@THEME:GetPath(EC_SOUNDS, '', 'normal-hitnormal')"
+			InitCommand="%function(self) P1C2RS = self:get(); end"
+		/>
+
+		<Layer
+			Type="ActorSound"
+			File="@THEME:GetPath(EC_SOUNDS, '', 'normal-hitnormal')"
+			InitCommand="%function(self) P1C3RS = self:get(); end"
+		/>
+
+		<Layer
+			Type="ActorSound"
+			File="@THEME:GetPath(EC_SOUNDS, '', 'combobreak.wav')"
+			Condition="GAMESTATE:IsPlayerEnabled(0)"
+			InitCommand="%function(self) P1CBRS = self:get(); end"
+		/>
+	</children></ActorFrame>
+
+	<ActorFrame
+		Condition="GetOptionHitSounds(1) ~= 0.0"
+		OnCommand="%function(self)
+			local P2CB = 0;
+			local P2C0RS = P2C0RS;
+			local P2C1RS = P2C1RS;
+			local P2C2RS = P2C2RS;
+			local P2C3RS = P2C3RS;
+			local P2CBRS = P2CBRS;
+			local stageStatsP2 = STATSMAN:GetCurStageStats():GetPlayerStageStats(1);
+			local showComboAt = tonumber(THEME:GetMetric('Combo', 'ShowComboAt'));
+			local getCombo = stageStatsP2.GetCurrentCombo;
+			local pan = P2C0RS.pan;
+			local getPan = getPan;
+			P2C0RS:volume(GetOptionHitSounds(1));
+			P2C1RS:volume(GetOptionHitSounds(1));
+			P2C2RS:volume(GetOptionHitSounds(1));
+			P2C3RS:volume(GetOptionHitSounds(1));
+			P2CBRS:volume(GetOptionHitSounds(1));
+			P2CBRS:pan(0.64);
+			self:SetUpdateFunction(function(self)
+				P2C0RS:pan(getPan(1, 0));
+				P2C1RS:pan(getPan(1, 1));
+				P2C2RS:pan(getPan(1, 2));
+				P2C3RS:pan(getPan(1, 3));
+				if getCombo(stageStatsP2) < P2CB and P2CB >= showComboAt then
+					P2CBRS:Play();
+				end
+				P2CB = getCombo(stageStatsP2);
+			end)
+		end"
+		StepP2LeftPressMessageCommand="%function(self) P2C0RS:Play(); end"
+		StepP2RightPressMessageCommand="%function(self) P2C1RS:Play(); end"
+		StepP2DownPressMessageCommand="%function(self) P2C2RS:Play(); end"
+		StepP2UpPressMessageCommand="%function(self) P2C3RS:Play(); end"
+	><children>
+		<Layer
+			Type="ActorSound"
+			File="@THEME:GetPath(EC_SOUNDS, '', 'normal-hitnormal')"
+			InitCommand="%function(self) P2C0RS = self:get(); end"
+		/>
+
+		<Layer
+			Type="ActorSound"
+			File="@THEME:GetPath(EC_SOUNDS, '', 'normal-hitnormal')"
+			InitCommand="%function(self) P2C1RS = self:get(); end"
+		/>
+
+		<Layer
+			Type="ActorSound"
+			File="@THEME:GetPath(EC_SOUNDS, '', 'normal-hitnormal')"
+			InitCommand="%function(self) P2C2RS = self:get(); end"
+		/>
+
+		<Layer
+			Type="ActorSound"
+			File="@THEME:GetPath(EC_SOUNDS, '', 'normal-hitnormal')"
+			InitCommand="%function(self) P2C3RS = self:get(); end"
+		/>
+
+		<Layer
+			Type="ActorSound"
+			File="@THEME:GetPath(EC_SOUNDS, '', 'combobreak.wav')"
+			Condition="GAMESTATE:IsPlayerEnabled(1)"
+			InitCommand="%function(self) P2CBRS = self:get(); end"
+		/>
+	</children></ActorFrame>
+</children></ActorFrame>

@@ -216,6 +216,27 @@ RefreshCommand="%
 			
 			
 />/>
+	<ActorFrame
+		OnCommand="PlayCommand,Refresh"
+		RefreshCommand="%
+			function(self)
+				_gameplaycoins_UpdateCount = 0
+				self:SetUpdateFunction(function(self)
+					_gameplaycoins_UpdateCount = _gameplaycoins_UpdateCount + 1
+					_gameplaycoins_DemoName:hidden(0);
+					_gameplaycoins_DemoName:draworder(2147483647);
+					_gameplaycoins_DemoName:settext(DemoName());
+				end);
+			end"
+	><children>
+		<Layer
+			Type="BitmapText"
+			Font="_v profile"
+			Text="@DemoName()"
+			InitCommand="%function(self) _gameplaycoins_DemoName = self; self:draworder(2147483647); end"
+			OnCommand="X,SCREEN_RIGHT-113;Y,SCREEN_BOTTOM-75;zoom,.7;maxwidth,300"
 
+		/>
+	</children></ActorFrame>
 
 </children></ActorFrame>

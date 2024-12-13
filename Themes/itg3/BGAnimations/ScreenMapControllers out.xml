@@ -1,0 +1,11 @@
+<ActorFrame
+	Sound="_options to options/_options.ogg"
+> <children>
+		<Layer
+			Type="Quad"
+			StartTransitioningCommand="%function(self) self:hidden(1); self:sleep(0.5); self:queuecommand('GoToTitleMenu') end"
+			GoToTitleMenuCommand="%function(self)
+				SCREENMAN:SetNewScreen(ScreenTitleBranch())
+			end"
+		/>
+</children> </ActorFrame>

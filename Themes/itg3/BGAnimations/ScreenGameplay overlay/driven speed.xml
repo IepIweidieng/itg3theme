@@ -1,0 +1,360 @@
+<ActorFrame><children>
+	<Quad
+		Condition="IsDriven(1)"
+		OnCommand="hidden,1;queuecommand,Set;queuecommand,Update"
+		SetCommand="%imp.P(function(self)
+			drivenP1 = {};
+
+			drivenP1.centerY = SCREEN_CENTER_Y;
+			drivenP1.reverse = GAMESTATE:PlayerIsUsingModifier(0, 'Reverse');
+			drivenP1.xSpeed = tonumber(modBase[1]) + tonumber(modExtra[1]);
+			if drivenP1.xSpeed > 0 and drivenP1.xSpeed < 1 then
+				drivenP1.rate = 1/math.floor(1/(tonumber(modExtra[1])) + 0.05);
+			else
+				drivenP1.rate = tonumber(modBase[1]);
+			end
+			if drivenP1.rate == 0 then
+				drivenP1.range = 0;
+			else
+				drivenP1.range = 4*64*(drivenP1.xSpeed / drivenP1.rate);
+				if drivenP1.range > SCREEN_HEIGHT - 160 then
+					drivenP1.rate = drivenP1.rate * 2;
+					drivenP1.range = 4*64*(drivenP1.xSpeed / drivenP1.rate);
+				end
+			end
+
+			drivenP1.objP1 = SCREENMAN:GetTopScreen():GetChild('PlayerP1');
+			drivenP1.objP3 = SCREENMAN:GetTopScreen():GetChild('PlayerP3');
+			if drivenP1.objP1 then
+				drivenP1.centerX = drivenP1.objP1:GetX();
+				drivenP1.objP1:GetChild('NoteField'):xy(0, 0);
+				GAMESTATE:ApplyModifiers('*10000 '..drivenP1.xSpeed..'x', 1);
+				GAMESTATE:ApplyModifiers('*10000 Centered', 1);
+				GAMESTATE:ApplyModifiers('*10000 20% Sudden', 1);
+				GAMESTATE:ApplyModifiers('*10000 65% Dark', 1);
+				GAMESTATE:ApplyModifiers('*10000 StealthPastReceptors', 1);
+				if drivenP1.rate > 0 then
+					GAMESTATE:ApplyModifiers('*10000 -90% HiddenOffset', 1);
+					GAMESTATE:ApplyModifiers('*10000 Hidden', 1);
+				else
+					GAMESTATE:ApplyModifiers('*10000 -100% DrawSizeBack', 1);
+					GAMESTATE:ApplyModifiers('*10000 -100% DrawSize', 1);
+				end
+				drivenP1.objP1:SetSizeSpline(0, -1, 0, 0, -1);
+				drivenP1.objP1:SetSizeSpline(1, -1, 150, (100 * (drivenP1.range + 16)/SCREEN_HEIGHT) / 64 / 2 * 1000, -1);
+			end
+
+			if drivenP1.objP3 then
+				drivenP1.objP3:hidden(0);
+				drivenP1.objP3:x(drivenP1.centerX);
+				drivenP1.objP3:GetChild('NoteField'):xy(0, 0);
+				GAMESTATE:ApplyModifiers('*10000 '..drivenP1.xSpeed..'x', 3);
+				GAMESTATE:ApplyModifiers('*10000 Dark', 3);
+				GAMESTATE:ApplyModifiers('*10000 Blind', 3);
+				GAMESTATE:ApplyModifiers('*10000 HideNoteFlash', 3);
+				GAMESTATE:ApplyModifiers('*10000 StealthPastReceptors', 3);
+				if drivenP1.rate > 0 then 
+					GAMESTATE:ApplyModifiers('*10000 Centered', 3);
+					GAMESTATE:ApplyModifiers('*10000 75% Stealth', 3);
+					GAMESTATE:ApplyModifiers('*10000 Hidden', 3);
+					GAMESTATE:ApplyModifiers('*10000 -75% Sudden', 3);
+					GAMESTATE:ApplyModifiers('*10000 -100% DrawSizeBack', 3);
+
+					drivenP1.objP3:SetSizeSpline(0, -1, 0, 0, -1);
+					drivenP1.objP3:SetSizeSpline(1, -1, 150, (100 * (drivenP1.range + 16)/SCREEN_HEIGHT) / 64 / 2 * 1000, -1);
+				else
+					GAMESTATE:ApplyModifiers('*10000 Stealth', 3);
+					GAMESTATE:ApplyModifiers('*1e9 -100% DrawSize', 3);
+				end
+			end
+
+		end)"
+		UpdateCommand="%imp.P(function(self)
+			local beat = GAMESTATE:GetSongBeat();
+			local interv = 0.01;
+
+			local function sN(value) return string.format('%0.2f', value); end
+
+			local progress = beat*drivenP1.rate/4;
+			drivenP1.phase = 2 * (progress - 2*math.floor(progress/2));
+			drivenP1.lastIsRev = drivenP1.isRev;
+			drivenP1.isRev = drivenP1.reverse ~= (drivenP1.phase >= 2);
+
+			local revDiff = drivenP1.isRev ~= drivenP1.lastIsRev;
+
+			local yFactor = (drivenP1.isRev and 1 or -1) * drivenP1.range/2;
+			local yP1 =  yFactor * (1 - math.mod(drivenP1.phase, 2));
+			local yP3 = -yFactor * (3 - math.mod(drivenP1.phase, 2));
+
+			local phase = 1-math.mod(drivenP1.phase/2, 1);
+			local rateOffset = 100 * 2*drivenP1.range/(drivenP1.range + SCREEN_HEIGHT);
+			local phaseOffset = phase * (rateOffset + 100) - 100;
+			local rateField = 100 * (drivenP1.range + 16)/SCREEN_HEIGHT;
+			local phaseField = phase * rateField;
+			if drivenP1.objP1 then
+				drivenP1.objP1:y(drivenP1.centerY + yP1);
+				drivenP1.objP1:SetVanishY(-yP1);
+
+				GAMESTATE:ApplyModifiers('*1e9 '..(phaseOffset)..'% SuddenOffset', 1);
+				if drivenP1.rate > 0 then GAMESTATE:ApplyModifiers('*1e9 '..(phaseField - 100)..'% DrawSize', 1); end
+			end
+
+			local revModP1 = '*1e9 '..(drivenP1.isRev and '' or 'No')..' '.. 'Reverse';
+			local revModP3 = '*1e9 '..(drivenP1.isRev and 'No' or '')..' '.. 'Reverse';
+			if drivenP1.rate > 0 then
+				if drivenP1.objP3 then
+					drivenP1.objP3:y(drivenP1.centerY + yP3);
+					drivenP1.objP3:SetVanishY(-yP3);
+
+					GAMESTATE:ApplyModifiers('*1e9 '..(phaseOffset)..'% HiddenOffset', 3);
+					GAMESTATE:ApplyModifiers('*1e9 '..(4 * phaseOffset + 300)..'% SuddenOffset', 3);
+					GAMESTATE:ApplyModifiers('*1e9 '..(phaseField + rateField - 100)..'% DrawSize', 3);
+				end
+				if revDiff then
+					if drivenP1.objP1 then GAMESTATE:ApplyModifiers(revModP1, 1); end
+					if drivenP1.objP3 then GAMESTATE:ApplyModifiers(revModP3, 3); end
+				end
+			end
+
+			self:sleep(interv);
+			self:queuecommand('Update');
+		end)"
+	/>
+
+	<Quad
+		Condition="IsDriven(2)"
+		OnCommand="hidden,1;queuecommand,Set;queuecommand,Update"
+		SetCommand="%imp.P(function(self)
+			drivenP2 = {};
+
+			drivenP2.centerY = SCREEN_CENTER_Y;
+			drivenP2.reverse = GAMESTATE:PlayerIsUsingModifier(1, 'Reverse');
+			drivenP2.xSpeed = tonumber(modBase[2]) + tonumber(modExtra[2]);
+			if drivenP2.xSpeed > 0 and drivenP2.xSpeed < 1 then
+				drivenP2.rate = 1/math.floor(1/(tonumber(modExtra[2])) + 0.05);
+			else
+				drivenP2.rate = tonumber(modBase[2]);
+			end
+			if drivenP2.rate == 0 then
+				drivenP2.range = 0;
+			else
+				drivenP2.range = 4*64*(drivenP2.xSpeed / drivenP2.rate);
+				if drivenP2.range > SCREEN_HEIGHT - 160 then
+					drivenP2.rate = drivenP2.rate * 2;
+					drivenP2.range = 4*64*(drivenP2.xSpeed / drivenP2.rate);
+				end
+			end
+
+			drivenP2.objP2 = SCREENMAN:GetTopScreen():GetChild('PlayerP2');
+			drivenP2.objP4 = SCREENMAN:GetTopScreen():GetChild('PlayerP4');
+			if drivenP2.objP2 then
+				drivenP2.centerX = drivenP2.objP2:GetX();
+				drivenP2.objP2:GetChild('NoteField'):xy(0, 0);
+				GAMESTATE:ApplyModifiers('*10000 '..drivenP2.xSpeed..'x', 2);
+				GAMESTATE:ApplyModifiers('*10000 Centered', 2);
+				GAMESTATE:ApplyModifiers('*10000 20% Sudden', 2);
+				GAMESTATE:ApplyModifiers('*10000 65% Dark', 2);
+				GAMESTATE:ApplyModifiers('*10000 StealthPastReceptors', 2);
+				if drivenP2.rate > 0 then
+					GAMESTATE:ApplyModifiers('*10000 -90% HiddenOffset', 2);
+					GAMESTATE:ApplyModifiers('*10000 Hidden', 2);
+				else
+					GAMESTATE:ApplyModifiers('*10000 -100% DrawSizeBack', 2);
+					GAMESTATE:ApplyModifiers('*10000 -100% DrawSize', 2);
+				end
+				drivenP2.objP2:SetSizeSpline(0, -1, 0, 0, -1);
+				drivenP2.objP2:SetSizeSpline(1, -1, 150, (100 * (drivenP2.range + 16)/SCREEN_HEIGHT) / 64 / 2 * 1000, -1);
+			end
+
+			if drivenP2.objP4 then
+				drivenP2.objP4:hidden(0);
+				drivenP2.objP4:x(drivenP2.centerX);
+				drivenP2.objP4:GetChild('NoteField'):xy(0, 0);
+				GAMESTATE:ApplyModifiers('*10000 '..drivenP2.xSpeed..'x', 4);
+				GAMESTATE:ApplyModifiers('*10000 Dark', 4);
+				GAMESTATE:ApplyModifiers('*10000 Blind', 4);
+				GAMESTATE:ApplyModifiers('*10000 HideNoteFlash', 4);
+				GAMESTATE:ApplyModifiers('*10000 StealthPastReceptors', 4);
+				if drivenP2.rate > 0 then 
+					GAMESTATE:ApplyModifiers('*10000 Centered', 4);
+					GAMESTATE:ApplyModifiers('*10000 75% Stealth', 4);
+					GAMESTATE:ApplyModifiers('*10000 Hidden', 4);
+					GAMESTATE:ApplyModifiers('*10000 -75% Sudden', 4);
+					GAMESTATE:ApplyModifiers('*10000 -100% DrawSizeBack', 4);
+
+					drivenP2.objP4:SetSizeSpline(0, -1, 0, 0, -1);
+					drivenP2.objP4:SetSizeSpline(1, -1, 150, (100 * (drivenP2.range + 16)/SCREEN_HEIGHT) / 64 / 2 * 1000, -1);
+				else
+					GAMESTATE:ApplyModifiers('*10000 Stealth', 4);
+					GAMESTATE:ApplyModifiers('*1e9 -100% DrawSize', 4);
+				end
+			end
+
+		end)"
+		UpdateCommand="%imp.P(function(self)
+			local beat = GAMESTATE:GetSongBeat();
+			local interv = 0.01;
+
+			local function sN(value) return string.format('%0.2f', value); end
+
+			local progress = beat*drivenP2.rate/4;
+			drivenP2.phase = 2 * (progress - 2*math.floor(progress/2));
+			drivenP2.lastIsRev = drivenP2.isRev;
+			drivenP2.isRev = drivenP2.reverse ~= (drivenP2.phase >= 2);
+
+			local revDiff = drivenP2.isRev ~= drivenP2.lastIsRev;
+
+			local yFactor = (drivenP2.isRev and 1 or -1) * drivenP2.range/2;
+			local yP2 =  yFactor * (1 - math.mod(drivenP2.phase, 2));
+			local yP4 = -yFactor * (3 - math.mod(drivenP2.phase, 2));
+
+			local phase = 1-math.mod(drivenP2.phase/2, 1);
+			local rateOffset = 100 * 2*drivenP2.range/(drivenP2.range + SCREEN_HEIGHT);
+			local phaseOffset = phase * (rateOffset + 100) - 100;
+			local rateField = 100 * (drivenP2.range + 16)/SCREEN_HEIGHT;
+			local phaseField = phase * rateField;
+			if drivenP2.objP2 then
+				drivenP2.objP2:y(drivenP2.centerY + yP2);
+				drivenP2.objP2:SetVanishY(-yP2);
+
+				GAMESTATE:ApplyModifiers('*1e9 '..(phaseOffset)..'% SuddenOffset', 2);
+				if drivenP2.rate > 0 then GAMESTATE:ApplyModifiers('*1e9 '..(phaseField - 100)..'% DrawSize', 2); end
+			end
+
+			local revModP2 = '*1e9 '..(drivenP2.isRev and '' or 'No')..' '.. 'Reverse';
+			local revModP4 = '*1e9 '..(drivenP2.isRev and 'No' or '')..' '.. 'Reverse';
+			if drivenP2.rate > 0 then
+				if drivenP2.objP4 then
+					drivenP2.objP4:y(drivenP2.centerY + yP4);
+					drivenP2.objP4:SetVanishY(-yP4);
+
+					GAMESTATE:ApplyModifiers('*1e9 '..(phaseOffset)..'% HiddenOffset', 4);
+					GAMESTATE:ApplyModifiers('*1e9 '..(4 * phaseOffset + 300)..'% SuddenOffset', 4);
+					GAMESTATE:ApplyModifiers('*1e9 '..(phaseField + rateField - 100)..'% DrawSize', 4);
+				end
+				if revDiff then
+					if drivenP2.objP2 then GAMESTATE:ApplyModifiers(revModP2, 2); end
+					if drivenP2.objP4 then GAMESTATE:ApplyModifiers(revModP4, 4); end
+				end
+			end
+
+			self:sleep(interv);
+			self:queuecommand('Update');
+		end)"
+	/>
+
+	<BitmapText
+		Condition="false"
+		Font="_r bold stroke"
+		OnCommand="x,SCREEN_CENTER_X-206;y,SCREEN_CENTER_Y;diffusealpha,0.5;shadowlength,0;zoom,0.5;queuecommand,Set;queuecommand,Update"
+		SetCommand="%imp.P(function(self)
+		end)"
+		UpdateCommand="%imp.P(function(self)
+			local beat = GAMESTATE:GetSongBeat();
+			local interv = 0.01;
+
+			local function sN(value) return string.format('%0.2f', value); end
+
+			local progress = beat*driven.rate/4;
+
+			local revDiff = driven.isRev ~= driven.lastIsRev;
+
+			local yFactor = (driven.isRev and 1 or -1) * driven.range/2;
+			local yP1 =  yFactor * (1 - math.mod(driven.phase, 2));
+			local yP2 = -yFactor * (3 - math.mod(driven.phase, 2));
+
+			local phase = 1-math.mod(driven.phase/2, 1);
+			local rateOffset = 100 * 2*driven.range/(driven.range + SCREEN_HEIGHT);
+			local phaseOffset = phase * (rateOffset + 100) - 100;
+			local rateField = 100 * (driven.range + 16)/SCREEN_HEIGHT;
+			local phaseField = phase * rateField;
+
+			local revModP1 = '*1e9 '..(driven.isRev and '' or 'No')..' '.. 'Reverse';
+			local revModP2 = '*1e9 '..(driven.isRev and 'No' or '')..' '.. 'Reverse';
+
+			self:settext('xy, '..SCREEN_CENTER_X..', '..sN(driven.centerY + yP1)..'\n'..
+						'SetVanishY('..sN(-yP1)..')\n'..
+						'*10000 '..driven.xSpeed..'x\n'..
+						'*10000 Centered'..'\n'..
+						'*10000 -90% HiddenOffset'..'\n'..
+						'*10000 Hidden'..'\n'..
+						'*10000 20% Sudden'..'\n'..
+						'*10000 65% Dark'..'\n'..
+						'*10000 StealthPastReceptors'..'\n'..
+						(driven.rate > 0 and
+							'*10000 -90% HiddenOffset\n'..
+							'*10000 Hidden\n'
+							or '*10000 -100% DrawSizeBack\n'..
+							'*10000 -100% DrawSize\n')..
+						'*1e9 '..sN(phaseOffset)..'% SuddenOffset'..'\n'..
+						(driven.rate > 0 and
+							'*1e9 '..sN(phaseField - 100)..'% DrawSize\n'..revModP1..'\n'
+						or '')..
+						'\n'..
+						'Beats: '..sN(beat)..'\n'..
+						'BPM: '..sN(60*GAMESTATE:GetCurBPS())..'\n'..
+						'rate: '..(driven.rate > 0 and driven.rate < 1 and ('1/'..(1/driven.rate)) or driven.rate)..'\n'..
+						'range: '..(driven.range)..'\n'..
+						'phase: '..sN(phase)..' / 1.00\n'..
+						'phaseOffset: '..sN(phaseOffset)..' / '..sN(rateOffset)..'\n'..
+						'phaseField: '..sN(phaseField)..' / '..sN(rateField) );
+			self:sleep(interv);
+			self:queuecommand('Update');
+		end)"
+	/>
+
+	<BitmapText
+		Condition="false"
+		Text="Sample Text"
+		Font="_r bold stroke"
+		OnCommand="x,SCREEN_CENTER_X+206;y,SCREEN_CENTER_Y;diffusealpha,0.5;shadowlength,0;zoom,0.5;queuecommand,Set;queuecommand,Update"
+		SetCommand="%imp.P(function(self)
+		end)"
+		UpdateCommand="%imp.P(function(self)
+			local interv = 0.01;
+
+			local function sN(value) return string.format('%0.2f', value); end
+
+			local revDiff = driven.isRev ~= driven.lastIsRev;
+
+			local yFactor = (driven.isRev and 1 or -1) * driven.range/2;
+			local yP2 = -yFactor * (3 - math.mod(driven.phase, 2));
+
+			local phase = 1-math.mod(driven.phase/2, 1);
+			local rateOffset = 100 * 2*driven.range/(driven.range + SCREEN_HEIGHT);
+			local phaseOffset = phase * (rateOffset + 100) - 100;
+			local rateField = 100 * (driven.range + 16)/SCREEN_HEIGHT;
+			local phaseField = phase * rateField;
+
+			local revModP2 = '*1e9 '..(driven.isRev and 'No' or '')..' '.. 'Reverse';
+
+			self:settext('xy, '..SCREEN_CENTER_X..', '..sN(driven.centerY + yP2)..'\n'..
+						'SetVanishY('..sN(-yP2)..')\n'..
+						'*10000 Dark'..'\n'..
+						'*10000 Blind'..'\n'..
+						'*10000 HideNoteFlash'..'\n'..
+						'*10000 StealthPastReceptors'..'\n'..
+						(driven.rate > 0 and
+							'*10000 '..driven.xSpeed..'x'..'\n'..
+							'*10000 Centered'..'\n'..
+							'*10000 85% Stealth'..'\n'..
+							'*10000 -100% DrawSizeBack'..'\n'..
+							'*10000 Hidden'..'\n'..
+							'*10000 -85% Sudden'..'\n'..
+							'*1e9 '..sN(phaseOffset)..'% HiddenOffset'..'\n'..
+							'*1e9 '..sN(4 * phaseOffset + 300)..'% SuddenOffset'..'\n'..
+							'*1e9 '..sN(phaseField + rateField - 100)..'% DrawSize'..'\n'..
+							'*1e9 SplineSizeReset'..'\n'..
+							'SetSizeSpline(0, -1, 40, 0, -1)'..'\n'..
+							'SetSizeSpline(1, -1, 40, '..sN((2.1 * phaseField) / 64 * 1000)..', -1)'..'\n'..
+							'SetSizeSpline(2, -1, 0, '..sN((2.1 * phaseField) / 64 * 1000 + 80)..', -1)'..'\n'..
+							revModP2
+						or
+							'*10000 Stealth'..'\n'..
+							'*10000 -100% DrawSize')
+						);
+			self:sleep(interv);
+			self:queuecommand('Update');
+		end)"
+	/>
+</children></ActorFrame>

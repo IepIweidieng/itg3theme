@@ -177,6 +177,8 @@ File="_coins"
    
 
 -->
+
+	<Layer Condition="FUCK_EXE and tonumber(GAMESTATE:GetVersionDate()) >= 20180617" File="OffsetPlot" />
      
 	</children>
 </ActorFrame>

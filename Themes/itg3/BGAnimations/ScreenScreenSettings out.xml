@@ -1,0 +1,19 @@
+<ActorFrame> <children>
+		<Layer
+			Type="Quad"
+			Condition="false and FUCK_EXE and tonumber(GAMESTATE:GetVersionDate()) >= 20170514"
+			StartTransitioningCommand="%function(self) self:hidden(1); self:sleep(0.5); self:queuecommand('SetWindowRatio') end"
+			SetWindowRatioCommand="%function(self)
+				SCREENMAN:SystemMessage('AspectRatio: '..tostring(PREFSMAN:GetPreference('AspectRatio'))..'\n'..
+										'DisplayAspectRatio: '..tostring(PREFSMAN:GetPreference('DisplayAspectRatio')))
+				local ratio = PREFSMAN:GetPreference('DisplayAspectRatio')
+				PREFSMAN:GetPreference('DisplayHeight')
+				PREFSMAN:GetPreference('DisplayWidth')
+				local height = math.min(PREFSMAN:GetPreference('DisplayHeight'), DISPLAY:GetDesktopHeight(), DISPLAY:GetDesktopWidth() / ratio)
+				local width = ratio * height
+				
+				PREFSMAN:SetPreference('DisplayHeight', height)
+				PREFSMAN:SetPreference('DisplayWidth', width)
+			end"
+		/>
+</children> </ActorFrame>

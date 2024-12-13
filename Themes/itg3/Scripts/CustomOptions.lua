@@ -515,7 +515,7 @@ function GetFailType()
 	-- assume "End of Song" unless otherwise specified
 	if not type then return "FailEndOfSong" end
 	-- always turn fail "Off" for the first song regardless of the Fail Type set in the menu.
-	if GAMESTATE:StageIndex() == 0 and type ~= "Off" then return "FailOff" end
+	if PREFSMAN:GetPreference('FailOffForFirstStageEasy') and GAMESTATE:StageIndex() == 0 and type ~= "Off" then return "FailOff" end
 	if type == "Immediately" then return "FailImmediate"
 	elseif type == "Off" then return "FailOff"
 	else return "FailEndOfSong" end

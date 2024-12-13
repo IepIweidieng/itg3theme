@@ -1,6 +1,21 @@
 <ActorFrame><children>
 
 <Layer
+File="CompareScores"
+Condition="CompareScores() == '1'"
+/>
+
+<Layer
+File="hitsound"
+Condition="FUCK_EXE and tonumber(GAMESTATE:GetVersionDate()) >= 20180617 and (GetOptionHitSounds(0) ~= 0.0 or GetOptionHitSounds(1) ~= 0.0)"
+/>
+
+<Layer
+File="driven speed"
+Condition="FUCK_EXE and tonumber(GAMESTATE:GetVersionDate()) >= 20180617 and (IsDriven(1) or IsDriven(2))"
+/>
+
+<Layer
 File="@GameplayOverlay()"
 Condition="not GAMESTATE:IsCourseMode() and not GAMESTATE:IsDemonstration()"
 />
@@ -197,10 +212,17 @@ File="..\_gameplaycoins"
 <Layer
 Condition="not GAMESTATE:IsDemonstration()
 and GAMESTATE:IsPlayerEnabled(PLAYER_1)
+and GAMESTATE:GetCurrentSteps(PLAYER_1)
 and GAMESTATE:IsPlayerEnabled(PLAYER_2)
+and GAMESTATE:GetCurrentSteps(PLAYER_2)
 and GetSongArtist() == 'Dragonforce'
 and GAMESTATE:GetCurrentSteps(PLAYER_1):GetDifficulty() == GAMESTATE:GetCurrentSteps(PLAYER_2):GetDifficulty()"
 File="_battlemeter"
+/>
+
+
+<Layer
+File="xpos tester"
 />
 
 </children></ActorFrame>

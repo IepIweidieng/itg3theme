@@ -94,12 +94,6 @@
 			OnCommand="y,-45;blend,add;diffuseblink;EffectPeriod,0.5;diffusealpha,0;sleep,36;linear,0.3;diffusealpha,1;sleep,4;linear,0.3;diffusealpha,0"
 		/>
 	</children></ActorFrame>
-	<Layer
-		Type="BitmapText"
-		Font="_v profile"
-		Text="@DemoName()"
-		OnCommand="X,SCREEN_RIGHT-113;Y,SCREEN_BOTTOM-75;zoom,.7;maxwidth,300"
-	/>
 	
 	<Layer
 		Type="Quad"

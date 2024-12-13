@@ -7,7 +7,7 @@
 	InitCommand="sleep,0.1;queuecommand,SPOCountDown;"
 	SPOCountDownCommand="%function(self)
 		self:stoptweening();
-		ScreenPlayerOptionsTimer = ScreenPlayerOptionsTimer - 0.1;
+		ScreenPlayerOptionsTimer = ScreenPlayerOptionsTimer or 0 - 0.1;
 			if ScreenPlayerOptionsTimer <= 0 then
 				ScreenPlayerOptionsTimer = 0;
 			end

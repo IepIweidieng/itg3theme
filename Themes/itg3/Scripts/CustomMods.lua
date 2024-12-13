@@ -126,7 +126,7 @@ function OptionNextScreen()
 		end,
 		
 		SaveSelections = function(self, list, pn)
-			if ( ( list[1] or list[2] ) and ScreenPlayerOptionsTimer < 5 ) then
+			if PREFSMAN:GetPreference( "MenuTimer" ) and ( ( list[1] or list[2] ) and ScreenPlayerOptionsTimer < 5 ) then
 			SCREENMAN:SystemMessage('Not Enough Time Left!')
 			elseif list[1] then SCREENMAN:SetNewScreen('ScreenSelectMusic2')
 			elseif list[2] then GetMoreOptionsScreen()
@@ -139,7 +139,7 @@ end
 
 function GetMoreOptionsScreen()
 	--Give players a bit of buffer when switching between More Options.
-	ScreenPlayerOptionsTimer = (ScreenPlayerOptionsTimer + 5)
+	ScreenPlayerOptionsTimer = (ScreenPlayerOptionsTimer or 0 + 5)
 	if ModsScreen == 'PlayerOptions' then
 	return SCREENMAN:SetNewScreen('ScreenSongOptions') else
 	return SCREENMAN:SetNewScreen('ScreenPlayerOptions')
@@ -287,11 +287,11 @@ function Gameplay(self)
 end
 
 function SetJudgmentFont()
-	if GAMESTATE:IsPlayerEnabled(PLAYER_1) and CustomMods[PLAYER_1].judgment ~= "ITG3" and GAMESTATE:GetCurrentSteps(PLAYER_1):GetDifficulty()~=DIFFICULTY_BEGINNER then
-		SCREENMAN:GetTopScreen():GetChild('PlayerP1'):GetChild('Judgment'):GetChild(''):Load( THEME:GetPath( EC_GRAPHICS, '', '_judgments/' .. CustomMods[PLAYER_1].judgment ))
+	if GAMESTATE:IsPlayerEnabled(PLAYER_1) and CustomMods[PLAYER_1].judgment ~= "ITG3" and CustomMods[PLAYER_1].judgment ~= nil and GAMESTATE:GetCurrentSteps(PLAYER_1):GetDifficulty()~=DIFFICULTY_BEGINNER then
+		SCREENMAN:GetTopScreen():GetChild('PlayerP1'):GetChild('Judgment'):GetChild(''):Load( THEME:GetPath( EC_GRAPHICS, '', '_judgments/' .. tostring(CustomMods[PLAYER_1].judgment) ))
 	end
-	if GAMESTATE:IsPlayerEnabled(PLAYER_2) and CustomMods[PLAYER_2].judgment ~= "ITG3" and GAMESTATE:GetCurrentSteps(PLAYER_2):GetDifficulty()~=DIFFICULTY_BEGINNER then
-		SCREENMAN:GetTopScreen():GetChild('PlayerP2'):GetChild('Judgment'):GetChild(''):Load( THEME:GetPath( EC_GRAPHICS, '', '_judgments/' .. CustomMods[PLAYER_2].judgment ))
+	if GAMESTATE:IsPlayerEnabled(PLAYER_2) and CustomMods[PLAYER_2].judgment ~= "ITG3" and CustomMods[PLAYER_1].judgment ~= nil and GAMESTATE:GetCurrentSteps(PLAYER_2):GetDifficulty()~=DIFFICULTY_BEGINNER then
+		SCREENMAN:GetTopScreen():GetChild('PlayerP2'):GetChild('Judgment'):GetChild(''):Load( THEME:GetPath( EC_GRAPHICS, '', '_judgments/' .. tostring(CustomMods[PLAYER_2].judgment) ))
 	end
 end
 
@@ -348,10 +348,16 @@ function ResetBeginnerDisplay()
 	if GAMESTATE:GetPlayMode() == PLAY_MODE_REGULAR  then
 		if GAMESTATE:IsPlayerEnabled(PLAYER_1) then 
 			if GAMESTATE:GetCurrentSteps(PLAYER_1):GetDifficulty()==DIFFICULTY_BEGINNER then 
-				CustomMods[PLAYER_1] = { hidescore = false, hidecombo = false, hidelife = false, showstats = false, showmods = false, normal = true, left = false, right = false, upsidedown = false, solo = false, vibrate = false, spin = false, spinreverse = false, bob = false, pulse = false, wag = false, dark = 0 } end end
+				CustomMods[PLAYER_1] = { hidescore = false, hidecombo = false, hidelife = false, showstats = false, showmods = false, normal = true, left = false, right = false, upsidedown = false, solo = false, vibrate = false, spin = false, spinreverse = false, bob = false, pulse = false, wag = false, dark = 0 }
+			else
+				if CustomMods[PLAYER_1].judgment == nil then CustomMods[PLAYER_1].judgment = "ITG3" end
+		end end
 		if GAMESTATE:IsPlayerEnabled(PLAYER_2) then 
 			if GAMESTATE:GetCurrentSteps(PLAYER_2):GetDifficulty()==DIFFICULTY_BEGINNER then 
-				CustomMods[PLAYER_2] = { hidescore = false, hidecombo = false, hidelife = false, showstats = false, showmods = false, normal = true, left = false, right = false, upsidedown = false, solo = false, vibrate = false, spin = false, spinreverse = false, bob = false, pulse = false, wag = false, dark = 0 } end end
+				CustomMods[PLAYER_2] = { hidescore = false, hidecombo = false, hidelife = false, showstats = false, showmods = false, normal = true, left = false, right = false, upsidedown = false, solo = false, vibrate = false, spin = false, spinreverse = false, bob = false, pulse = false, wag = false, dark = 0 }
+			else
+				if CustomMods[PLAYER_2].judgment == nil then CustomMods[PLAYER_2].judgment = "ITG3" end
+		end end
 	end
 			
 end
@@ -463,13 +469,30 @@ local s = "y,SCREEN_TOP+240;"
 end
 
 -- [LifeP1OnCommand] --
-function GetLifeBarEffectsP1()
-	s = 'rotationz,-90;addx,-100;sleep,0.5;decelerate,0.8;addx,100;DrawOrder,-1';
-	
+function GetLifeBarEffectsP1(actor)
 	if IsLifeHidden(PLAYER_1) == 1 then 
-	s = 'hidden,1' return s end
+		return actor:hidden(1);
+	else
+		if FUCK_EXE then
+			actor:GetChild('Background'):zoomx(16/520);
+			actor:GetChild('Background'):rotationz(-90);
+			actor:GetChild(''):zoomtowidth(18);
+			actor:GetChildAt(2):zoomx(18/272);
+			actor:GetChildAt(2):rotationz(-90);
+			actor:GetChild('Frame'):rotationz(-90);
+		else
+			actor:rotationz(-90);
+		end
+	end
 
-	return s
+	actor:finishtweening();
+	actor:addx(-100);
+	actor:sleep(0.5);
+	actor:decelerate(0.8);
+	actor:addx(100);
+	actor:draworder(-1);
+
+	return
 end
 
 -- [ScoreP1OnCommand] --
@@ -488,13 +511,30 @@ function GetPlayerEffectsP1(pn)
 end
 
 -- [LifeP2OnCommand] --
-function GetLifeBarEffectsP2()
-	s = 'draworder,-1;rotationz,-90;addx,100;sleep,0.5;decelerate,0.8;addx,-100';
-
+function GetLifeBarEffectsP2(actor)
 	if IsLifeHidden(PLAYER_2) == 1 then 
-	s = 'hidden,1' return s end
+		return actor:hidden(1);
+	else
+		if FUCK_EXE then
+			actor:GetChild('Background'):zoomx(16/520);
+			actor:GetChild('Background'):rotationz(-90);
+			actor:GetChild(''):zoomtowidth(18);
+			actor:GetChildAt(2):zoomx(18/272);
+			actor:GetChildAt(2):rotationz(-90);
+			actor:GetChild('Frame'):rotationz(-90);
+		else
+			actor:rotationz(-90);
+		end
+	end
 	
-	return s
+	actor:finishtweening();
+	actor:draworder(-1);
+	actor:addx(100);
+	actor:sleep(0.5);
+	actor:decelerate(0.8);
+	actor:addx(-100);
+
+	return
 end
 
 -- [ScoreP2OnCommand] --

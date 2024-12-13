@@ -1,0 +1,346 @@
+<ActorFrame><children>
+	<ActorFrame
+		Condition="FUCK_EXE and tonumber(GAMESTATE:GetVersionDate()) >= 20180617"
+	><children>
+
+		<ActorFrame
+			Condition="false"
+		><children>
+			<Quad
+				Condition="true"
+				OnCommand="scaletocover,0,0,5,5;diffuse,1,1,1,1;queuecommand,Update"
+				UpdateCommand="%imp.P(function(self)
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP1');
+					local x, y, z = obj:GetX(), obj:GetY(), obj:GetZ();
+					self:xyz(x, y, z);
+					self:sleep(0.02);
+					self:queuecommand('Update');
+				end)"
+			/>
+			<Quad
+				Condition="true"
+				OnCommand="scaletocover,0,0,5,5;diffuse,1,0,0,0.75;queuecommand,Update"
+				UpdateCommand="%imp.P(function(self)
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP1');
+					local x, y, z = obj:GetX(), obj:GetY(), obj:GetZ();
+					local o = obj:GetChild('NoteField');
+					local ox, oy, oz = o:GetX(), o:GetY(), o:GetZ();
+					self:xyz(ox+x, oy+y, oz+z);
+					self:sleep(0.02);
+					self:queuecommand('Update');
+				end)"
+			/>
+		</children></ActorFrame>
+
+		<ActorFrame
+			Condition="false"
+		><children>
+			<BitmapText
+				Condition="true"
+				Font="_r bold stroke"
+				OnCommand="diffusealpha,0.5;shadowlength,0;zoom,0.5;queuecommand,Set;queuecommand,Update"
+				SetCommand="%imp.P(function(self)
+					GAMESTATE:ApplyModifiers('300% DrawSize', 1);
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP1');
+
+					obj:xy(SCREEN_CENTER_X, SCREEN_CENTER_Y);
+					obj:fov(100);
+				end)"
+				UpdateCommand="%imp.P(function(self)
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP1');
+					local zoomx, zoomy, zoomz = obj:GetZoomX()*obj:GetBaseZoomX(), obj:GetZoomY(), obj:GetZoomZ();
+					local x, y, z = obj:GetX(), obj:GetY(), obj:GetZ();
+					local rot = {obj:getrotation()};
+
+					local o = obj:GetChild('NoteField');
+					local ozoomx, ozoomy, ozoomz = o:GetZoomX()*o:GetBaseZoomX(), o:GetZoomY(), o:GetZoomZ();
+					local ox, oy, oz = o:GetX(), o:GetY(), o:GetZ();
+					local orot = {o:getrotation()};
+
+					local beat = GAMESTATE:GetSongBeat();
+
+					local function sN(value) return string.format('%0.2f', value); end
+					self:xyz(x, y, z);
+					self:settext('p1: ('..sN(zoomx)..', '..sN(zoomy)..', '..sN(zoomz)..')x\n('..sN(x)..', '..sN(y)..', '..sN(z)..'),\n['..sN(rot[1])..', '..sN(rot[2])..', '..sN(rot[3])..']\n\n'..
+						'p1.nf: ('..sN(ozoomx)..', '..sN(ozoomy)..', '..sN(ozoomz)..')x\n('..sN(ox)..', '..sN(oy)..', '..sN(oz)..'),\n['..sN(orot[1])..', '..sN(orot[2])..', '..sN(orot[3])..']');
+					self:sleep(0.02);
+					self:queuecommand('Update');
+
+					obj:rotationx(math.sin(beat * -43/8/ 360)*180);
+					obj:rotationy(math.sin(-beat * 47/8/ 360)*180);
+					obj:rotationz(math.sin(beat * 41/8/ 360)*180);
+					o:rotationy(math.sin(beat * 37/8/ 360)*180);
+					o:rotationz(math.sin(beat * 59/8/ 360)*180);
+				end)"
+			/>
+			<BitmapText
+				Condition="true"
+				Font="_r bold stroke"
+				OnCommand="diffusealpha,0.5;shadowlength,0;zoom,0.5;queuecommand,Set;queuecommand,Update"
+				SetCommand="%imp.P(function(self)
+					GAMESTATE:ApplyModifiers('300% DrawSize', 2);
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP2');
+
+					obj:xy(SCREEN_CENTER_X, SCREEN_CENTER_Y);
+					obj:fov(100);
+				end)"
+				UpdateCommand="%imp.P(function(self)
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP2');
+					local zoomx, zoomy, zoomz = obj:GetZoomX()*obj:GetBaseZoomX(), obj:GetZoomY(), obj:GetZoomZ();
+					local x, y, z = obj:GetX(), obj:GetY(), obj:GetZ();
+					local rot = {obj:getrotation()};
+
+					local o = obj:GetChild('NoteField');
+					local ozoomx, ozoomy, ozoomz = o:GetZoomX()*o:GetBaseZoomX(), o:GetZoomY(), o:GetZoomZ();
+					local ox, oy, oz = o:GetX(), o:GetY(), o:GetZ();
+					local orot = {o:getrotation()};
+
+					local beat = GAMESTATE:GetSongBeat();
+
+					local function sN(value) return string.format('%0.2f', value); end
+					self:xyz(x, y, z);
+					--self:settext('obj: ('..sN(zoomx)..', '..sN(zoomy)..', '..sN(zoomz)..')x\n('..sN(x)..', '..sN(y)..', '..sN(z)..'),\n['..sN(rot[1])..', '..sN(rot[2])..', '..sN(rot[3])..']\n\n'..
+					--	'o: ('..sN(ozoomx)..', '..sN(ozoomy)..', '..sN(ozoomz)..')x\n('..sN(ox)..', '..sN(oy)..', '..sN(oz)..'),\n['..sN(orot[1])..', '..sN(orot[2])..', '..sN(orot[3])..']');
+					self:sleep(0.02);
+					self:queuecommand('Update');
+
+					obj:rotationx(math.sin(beat * -43/8/ 360)*180);
+					obj:rotationy(math.sin(-beat * 47/8/ 360)*180+180);
+					obj:rotationz(math.sin(beat * -41/8/ 360)*180);
+					o:rotationy(math.sin(beat * 37/8/ 360)*180);
+					o:rotationz(math.sin(beat * -59/8/ 360)*180);
+				end)"
+			/>
+			<BitmapText
+				Condition="true"
+				Font="_r bold stroke"
+				Text="Left"
+				InitCommand="%function(self)
+					ReceptorText = self;
+					function double3DRotation(obj, pn, column)
+						local nf = obj:GetChild('NoteField');
+						local x = ((2*(column-2)+1)*64/2 + GAMESTATE:GetX(pn, column, 0));
+						local y = (GAMESTATE:GetY(pn, column, 0));
+						local z = (GAMESTATE:GetZ(pn, column, 0));
+						local rotx, roty, rotz = nf:getrotation();
+						local rotxt, rotyt, rotzt = obj:getrotation();
+						local degToRad = math.pi/180;
+						rotx = degToRad*rotx;
+						roty = degToRad*roty;
+						rotz = degToRad*rotz;
+						rotxt = degToRad*rotxt;
+						rotyt = degToRad*rotyt;
+						rotzt = degToRad*rotzt;
+						local cosx = math.cos(rotx);
+						local cosy = math.cos(roty);
+						local cosz = math.cos(rotz);
+						local sinx = math.sin(rotx);
+						local siny = math.sin(roty);
+						local sinz = math.sin(rotz);
+						local xt = (x*cosy*cosz-y*cosy*sinz+z*siny) * obj:GetZoomX()*obj:GetBaseZoomX();
+						local yt = (x*(sinx*siny*cosz+cosx*sinz)+y*(-sinx*siny*sinz+cosx*cosz)-z*sinx*cosy) * obj:GetZoomY();
+						local zt = (x*(-cosx*siny*cosz+sinx*sinz)+y*(cosx*siny*sinz+sinx*cosz)+z*cosx*cosy) * obj:GetZoomZ();
+
+						local cosxt = math.cos(rotxt);
+						local cosyt = math.cos(rotyt);
+						local coszt = math.cos(rotzt);
+						local sinxt = math.sin(rotxt);
+						local sinyt = math.sin(rotyt);
+						local sinzt = math.sin(rotzt);
+						local xtt = xt*cosyt*coszt-yt*cosyt*sinzt+zt*sinyt;
+						local ytt = xt*(sinxt*sinyt*coszt+cosxt*sinzt)+yt*(-sinxt*sinyt*sinzt+cosxt*coszt)-zt*sinxt*cosyt;
+						local ztt = xt*(-cosxt*sinyt*coszt+sinxt*sinzt)+yt*(cosxt*sinyt*sinzt+sinxt*coszt)+zt*cosxt*cosyt;
+
+						return (nf:GetX() + xtt) * nf:GetZoomX()*nf:GetBaseZoomX(), (nf:GetY() + ytt) * nf:GetZoomY(), (nf:GetZ() + ztt) * nf:GetZoomZ();
+					end
+				end"
+				OnCommand="draworder,100;diffusealpha,0.5;shadowlength,0;zoom,0.5;queuecommand,Update"
+				UpdateCommand="%imp.P(function(self)
+					pn = 0;
+					column = 0;
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP'..tostring(pn+1));
+
+					local xtt, ytt, ztt = double3DRotation(obj, pn, column);
+					self:xyz(obj:GetX() + xtt, obj:GetY() + ytt, obj:GetZ() + ztt);
+
+					self:sleep(0.02);
+					self:queuecommand('Update');
+
+				end)"
+			/>
+			<BitmapText
+				Condition="true"
+				Font="_r bold stroke"
+				Text="Down"
+				OnCommand="draworder,100;diffusealpha,0.5;shadowlength,0;zoom,0.5;queuecommand,Update"
+				UpdateCommand="%imp.P(function(self)
+					pn = 0;
+					column = 1;
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP'..tostring(pn+1));
+
+					local xtt, ytt, ztt = double3DRotation(obj, pn, column);
+					self:xyz(obj:GetX() + xtt, obj:GetY() + ytt, obj:GetZ() + ztt);
+
+					self:sleep(0.02);
+					self:queuecommand('Update');
+
+				end)"
+			/>
+			<BitmapText
+				Condition="true"
+				Font="_r bold stroke"
+				Text="Up"
+				OnCommand="draworder,100;diffusealpha,0.5;shadowlength,0;zoom,0.5;queuecommand,Update"
+				UpdateCommand="%imp.P(function(self)
+					pn = 0;
+					column = 2;
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP'..tostring(pn+1));
+
+					local xtt, ytt, ztt = double3DRotation(obj, pn, column);
+					self:xyz(obj:GetX() + xtt, obj:GetY() + ytt, obj:GetZ() + ztt);
+
+					self:sleep(0.02);
+					self:queuecommand('Update');
+
+				end)"
+			/>
+			<BitmapText
+				Condition="true"
+				Font="_r bold stroke"
+				Text="Right"
+				OnCommand="draworder,100;diffusealpha,0.5;shadowlength,0;zoom,0.5;queuecommand,Update"
+				UpdateCommand="%imp.P(function(self)
+					pn = 0;
+					column = 3;
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP'..tostring(pn+1));
+
+					local xtt, ytt, ztt = double3DRotation(obj, pn, column);
+					self:xyz(obj:GetX() + xtt, obj:GetY() + ytt, obj:GetZ() + ztt);
+
+					self:sleep(0.02);
+					self:queuecommand('Update');
+
+				end)"
+			/>
+
+
+			<BitmapText
+				Condition="true"
+				Font="_r bold stroke"
+				Text="Left"
+				OnCommand="draworder,99;diffusealpha,0.3;shadowlength,0;zoom,0.5;queuecommand,Update"
+				UpdateCommand="%imp.P(function(self)
+					pn = 1;
+					column = 0;
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP'..tostring(pn+1));
+
+					local xtt, ytt, ztt = double3DRotation(obj, pn, column);
+					self:xyz(obj:GetX() + xtt, obj:GetY() + ytt, obj:GetZ() + ztt);
+
+					self:sleep(0.02);
+					self:queuecommand('Update');
+
+				end)"
+			/>
+			<BitmapText
+				Condition="true"
+				Font="_r bold stroke"
+				Text="Down"
+				OnCommand="draworder,99;diffusealpha,0.3;shadowlength,0;zoom,0.5;queuecommand,Update"
+				UpdateCommand="%imp.P(function(self)
+					pn = 1;
+					column = 1;
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP'..tostring(pn+1));
+
+					local xtt, ytt, ztt = double3DRotation(obj, pn, column);
+					self:xyz(obj:GetX() + xtt, obj:GetY() + ytt, obj:GetZ() + ztt);
+
+					self:sleep(0.02);
+					self:queuecommand('Update');
+
+				end)"
+			/>
+			<BitmapText
+				Condition="true"
+				Font="_r bold stroke"
+				Text="Up"
+				OnCommand="draworder,99;diffusealpha,0.3;shadowlength,0;zoom,0.5;queuecommand,Update"
+				UpdateCommand="%imp.P(function(self)
+					pn = 1;
+					column = 2;
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP'..tostring(pn+1));
+
+					local xtt, ytt, ztt = double3DRotation(obj, pn, column);
+					self:xyz(obj:GetX() + xtt, obj:GetY() + ytt, obj:GetZ() + ztt);
+
+					self:sleep(0.02);
+					self:queuecommand('Update');
+
+				end)"
+			/>
+			<BitmapText
+				Condition="true"
+				Font="_r bold stroke"
+				Text="Right"
+				OnCommand="draworder,99;diffusealpha,0.3;shadowlength,0;zoom,0.5;queuecommand,Update"
+				UpdateCommand="%imp.P(function(self)
+					pn = 1;
+					column = 3;
+					local obj = SCREENMAN:GetTopScreen():GetChild('PlayerP'..tostring(pn+1));
+
+					local xtt, ytt, ztt = double3DRotation(obj, pn, column);
+					self:xyz(obj:GetX() + xtt, obj:GetY() + ytt, obj:GetZ() + ztt);
+
+					self:sleep(0.02);
+					self:queuecommand('Update');
+
+				end)"
+			/>
+
+
+			<BitmapText
+				Condition="true"
+				Font="_r bold stroke"
+				OnCommand="diffusealpha,0.5;shadowlength,0;zoom,0.5;queuecommand,Update"
+				UpdateCommand="%imp.P(function(self)
+					local obj = ReceptorText;
+					local o = SCREENMAN:GetTopScreen():GetChild('PlayerP'..tostring(pn+1));
+					local function sN(value) return string.format('%0.1f', value); end
+
+					obj:settext('');
+					self:settext('('..sN(obj:GetX()-o:GetX())..
+						', '..sN(obj:GetY()-o:GetY())..
+						', '..sN(obj:GetZ()-o:GetZ())..')');
+					self:xyz(obj:GetX(), obj:GetY(), obj:GetZ());
+
+					self:sleep(0.02);
+					self:queuecommand('Update');
+				end)"
+			/>
+		</children></ActorFrame>
+	</children></ActorFrame>
+
+
+	<Layer
+		Type="BitmapText"
+		Font="_v profile"
+		Text="@(function(self)
+			local function prefToWindowMs(pref)
+				return string.format('%.2f', (PREFSMAN:GetPreference(pref)*PREFSMAN:GetPreference('JudgeWindowScale')*1000+0.005));
+			end
+			return
+			'        Fantastic Window: ' .. prefToWindowMs('JudgeWindowSecondsMarvelous') .. 'ms' ..
+				'        Mine Window     : ' ..  prefToWindowMs('JudgeWindowSecondsMine') .. 'ms\n' ..
+			'        Excellent Window: ' ..  prefToWindowMs('JudgeWindowSecondsPerfect') .. 'ms' ..
+				'        Hold Window     : ' ..  prefToWindowMs('JudgeWindowSecondsOK') .. 'ms\n' ..
+			'        Great Window       : ' ..  prefToWindowMs('JudgeWindowSecondsGreat') .. 'ms' ..
+				'      Roll Window      : ' ..  prefToWindowMs('JudgeWindowSecondsRoll') .. 'ms\n' ..
+			'        Decent Window    : ' ..  prefToWindowMs('JudgeWindowSecondsGood') .. 'ms\n' ..
+			'        Way Off Window  : ' ..  prefToWindowMs('JudgeWindowSecondsBoo') .. 'ms\n';
+		end)()"
+		InitCommand="x,0;y,32;horizalign,left;vertalign,top;zoom,0.7;draworder,110"
+		OnCommand="hidden,0;diffusealpha,0;linear,0.5;diffusealpha,0.7;sleep,1;queuecommand,FadeOut"
+		FadeOutCommand="linear,0.5;diffusealpha,0;sleep,0;queuecommand,Hide"
+		HideCommand="hidden,1"
+	/>
+</children></ActorFrame>

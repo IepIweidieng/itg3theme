@@ -1,19 +1,20 @@
 -- Override these in other themes.
 function PlayerOptionsMods()
 	if OPENITG then
+		local hs = FUCK_EXE and tonumber(GAMESTATE:GetVersionDate()) >= 20180617 and ",210" or ""
 		if GAMESTATE:GetPlayMode() == PLAY_MODE_REGULAR then
-			return "101,102,103,2,3,4,5,6,20,51,99,100" --OpenITG Normal Gameplay	
+			return "101,102,103,2,3,4,5,6,20,51,52,99"..hs..",100" --OpenITG Normal Gameplay	
 		elseif GAMESTATE:GetPlayMode() == PLAY_MODE_NONSTOP then
-			return "101,102,103,2,3,4,5,6,20,52,99,100" --OpenITG Marathon Gameplay
+			return "101,102,103,2,3,4,5,6,20,52,99"..hs..",100" --OpenITG Marathon Gameplay
 		elseif GAMESTATE:GetPlayMode() == PLAY_MODE_RAVE then
-			return "101,102,103,2,3,4,999" --OpenITG Battle Gameplay
+			return "101,102,103,2,3,4,999"..hs --OpenITG Battle Gameplay
 		else
-			return "101,102,103,2,99" --OpenITG Survival/Fallback Gameplay
+			return "101,102,103,2,99"..hs --OpenITG Survival/Fallback Gameplay
 		end
 	end
 
 	if GAMESTATE:GetPlayMode() == PLAY_MODE_REGULAR then
-		return "101,102,103,2,3,4,5,6,20,99,100" --Normal Gameplay
+		return "101,102,103,2,3,4,5,6,20,52,99,100" --Normal Gameplay
 	elseif GAMESTATE:GetPlayMode() == PLAY_MODE_NONSTOP then
 		return "101,102,103,2,3,4,5,6,20,52,99,100" --Marathon Gameplay
 	elseif GAMESTATE:GetPlayMode() == PLAY_MODE_RAVE then
@@ -1187,8 +1188,13 @@ function HideTimer()
 	if enabled then return "0" else return "1" end
 end
 
+function IsDriven(pn)
+	if modType == nil then InitializeSpeedMods(); end
+	return modType[pn] == "driven-mod"
+end
 
 function SpeedMods(name)
+	if baseSpeed == nil then InitializeSpeedMods(); end
 	local modList = baseSpeed; s = "Speed"
 	if name == "Extra" then modList = extraSpeed; s = "Extra " .. s end
 	if name == "Type" then modList = typeSpeed; s = s .. " Type" end
@@ -1228,6 +1234,7 @@ function SpeedMods(name)
 			if modType[p] == 'x-mod' then modSpeed[p] = modBase[p] + modExtra[p] .. 'x' end
 			if modType[p] == 'c-mod' then modSpeed[p] = 'c' .. modBase[p]*100 + modExtra[p]*100 end
 			if modType[p] == 'm-mod' then modSpeed[p] = 'm' .. modBase[p]*100 + modExtra[p]*100 end
+			if modType[p] == 'driven-mod' then modSpeed[p] = modBase[p] + modExtra[p] .. 'driven' end
 			GAMESTATE:ApplyGameCommand('mod,1x',p)
 			ApplyRateAdjust()
 			MESSAGEMAN:Broadcast('SpeedModChanged')
@@ -1283,7 +1290,9 @@ function InitializeSpeedMods()
 	baseSpeed = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19" }
 	extraSpeed = { "0", "+.25", "+.5", "+.75", "+.1", "+.2", "+.3", "+.4", "+.6", "+.7", "+.8", "+.9" }
 	
-	if OPENITG then
+	if FUCK_EXE and tonumber(GAMESTATE:GetVersionDate()) >= 20180617 then
+	typeSpeed = { "x-mod", "c-mod", "m-mod", "driven-mod" }
+	elseif OPENITG then
 	typeSpeed = { "x-mod", "c-mod", "m-mod" }
 	else
 	typeSpeed = { "x-mod", "c-mod" }
@@ -1293,10 +1302,11 @@ end
 function ApplyRateAdjust()
 	for pn=1, 2 do
 		if GAMESTATE:IsPlayerEnabled( pn - 1 ) then
-			speed = string.gsub(modSpeed[pn],modType[pn],"")
-			if modType[pn] == "x" then speed = math.ceil(100*speed/modRate)/100 .. "x" end
-			if modType[pn] == "c" then speed = "c" .. math.ceil(speed/modRate) end
-			if modType[pn] == "m" then speed = "m" .. math.ceil(speed/modRate) end
+			speed = string.gsub(modSpeed[pn],string.gsub(modType[pn],"-mod",""),"")
+			if modType[pn] == "x-mod" then speed = math.ceil(100*speed/modRate)/100 .. "x" end
+			if modType[pn] == "c-mod" then speed = "c" .. math.ceil(speed/modRate) end
+			if modType[pn] == "m-mod" then speed = "m" .. math.ceil(speed/modRate) end
+			if modType[pn] == "driven-mod" then speed = math.ceil(100*speed/modRate)/100 .. "x" end
 			GAMESTATE:ApplyGameCommand('mod,' .. speed,pn)
 		end
 	end
@@ -1304,15 +1314,27 @@ end
 
 function RevertRateAdjust()
 	for pn=1, 2 do
-		if modSpeed and modSpeed[pn] then GAMESTATE:ApplyGameCommand('mod,' .. modSpeed[pn],pn) end
+		if modSpeed and modSpeed[pn] then
+			if modType and modType[pn] == "driven-mod" then
+				speed = modBase[pn] + modExtra[pn]
+				speed = speed .. "x"
+				GAMESTATE:ApplyGameCommand('mod,' .. speed,pn)
+			else
+		 		GAMESTATE:ApplyGameCommand('mod,' .. modSpeed[pn],pn)
+		 	end
+		end
 	end
 end
 
 function DisplaySpeedMod(pn)
 	local s = modSpeed[pn]
-	if modType[pn] == "x-mod" then
+	local suffix = "x"
+	if IsDriven(pn) then
+		suffix = "d"
+	end
+	if modType[pn] == "x-mod" or modType[pn] == "driven-mod" then
 		if modExtra[pn] == "0" then
-		s = modBase[pn] + modExtra[pn] .. ".00" .. "x"
+		s = modBase[pn] + modExtra[pn] .. ".00" .. suffix
 		end
 		if modExtra[pn] == "+.1" or 
 		modExtra[pn] == "+.2" or 
@@ -1323,15 +1345,15 @@ function DisplaySpeedMod(pn)
 		modExtra[pn] == "+.7" or
 		modExtra[pn] == "+.8" or
 		modExtra[pn] == "+.9" then
-		s = modBase[pn] + modExtra[pn] .. "0" .. "x"
+		s = modBase[pn] + modExtra[pn] .. "0" .. suffix
 		end
 		if tonumber(modBase[pn]) <= 9 then
 		s = string.sub(s, 1, 4)
-		s = s .. "x"
+		s = s .. suffix
 		end
 		if tonumber(modBase[pn]) > 9 then
 		s = string.sub(s, 1, 5)
-		s = s .. "x"
+		s = s .. suffix
 		end
 	end
 	return s
@@ -1342,10 +1364,11 @@ function DisplayBPM(pn)
 	speedMod = string.gsub(speedMod,'x','')
 	speedMod = string.gsub(speedMod,'c','')
 	speedMod = string.gsub(speedMod,'m','')
+	speedMod = string.gsub(speedMod,'driven','')
 	local lowBPM = bpm[1]
 	local highBPM = bpm[2]
 
-	if modType[pn] == "x-mod" then
+	if modType[pn] == "x-mod" or IsDriven(pn) then
 
 		if lowBPM == "Various" or lowBPM == "..." or lowBPM == nil then
 		return "???"
@@ -1376,7 +1399,7 @@ function DisplayBPM(pn)
 		if highBPM ~= "" then
 
 			highScrollBPM = highBPM * speedMod * modRate
-		
+			
 			if string.sub(highScrollBPM, 2, 2) == "." then
 			highScrollBPM = string.sub(highScrollBPM, 1, 1)
 			end
@@ -1426,14 +1449,14 @@ function GetTimer(screen)
 		if ScreenSelectMusicTimer == nil then
 			ScreenSelectMusicTimer = GetMusicSelectTime();
 		end
-	return math.ceil(ScreenSelectMusicTimer)
+	return math.ceil(ScreenSelectMusicTimer or 0)
 	end
 	
 	if screen == "ScreenPlayerOptions" then
 		if ScreenPlayerOptionsTimer == nil then
 			ScreenPlayerOptionsTimer = GetOptionsSelectTime();
 		end
-	return math.ceil(ScreenPlayerOptionsTimer)
+	return math.ceil(ScreenPlayerOptionsTimer or 0)
 	end
 
 	return 0;
